@@ -1,0 +1,3 @@
+---
+# tasks file for snort
+- include_tasks: snoopy.yml

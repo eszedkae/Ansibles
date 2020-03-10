@@ -1,0 +1,4 @@
+---
+# Install OSSEC HIDS
+- include_tasks: ossec.yml
+

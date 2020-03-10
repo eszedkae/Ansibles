@@ -1,0 +1,26 @@
+######################################## 
+# Global directives #
+######################################## 
+User nxlog 
+Group nxlog 
+LogFile /var/log/nxlog/nxlog.log 
+LogLevel INFO 
+<Extension multi> 
+    Module xm_syslog
+</Extension> 
+<Input in> 
+    Module  im_file
+    File    "/var/log/snort/alert"
+</Input> 
+<Output out> 
+    Module  om_tcp
+    Host    {{graylog_ip}}
+    Port    {{snort_port}} 
+    Exec    to_syslog_ietf();
+</Output>
+######################################## 
+# Routes #
+######################################## 
+<Route r> 
+    Path    in => out 
+</Route>

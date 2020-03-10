@@ -1,0 +1,24 @@
+- name: Getting Remote IPv4
+  set_fact:
+    remote_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- name: Downloading Nxlog Community Edition v2.10.2150-1
+  get_url: 
+    url: "https://nxlog.co/system/files/products/files/348/nxlog-ce_2.10.2150_ubuntu_bionic_amd64.deb"
+    dest: /opt/nxlog-ce_2.10.2150_ubuntu_bionic_amd64.deb
+
+- name: Installing Nxlog Community Edition v2.10.2150-1
+  shell: apt install -y /opt/nxlog-ce_2.10.2150_ubuntu_bionic_amd64.deb
+
+- name: Running Configurations
+  template:
+    src: nxlog.conf.j2
+    dest: /etc/nxlog.conf
+
+- name: Enabling Service nxlog
+  command: systemctl enable nxlog
+
+- name: Starting Service nxlog
+  service:
+    name: nxlog
+    state: started

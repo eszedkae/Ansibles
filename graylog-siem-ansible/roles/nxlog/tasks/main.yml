@@ -1,0 +1,3 @@
+---
+# tasks file for nxlog
+- include_tasks: nxlog.yml

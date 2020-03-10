@@ -1,0 +1,15 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    interface_name: "ens3"
+    graylog_ip: "10.1.1.1"
+    ossec_port: "5141"
+    snort_port: "5142"
+    snoopy_port: "5143"
+
+  roles:
+    - ossec
+    - snort
+    - nxlog
+    - snoopy

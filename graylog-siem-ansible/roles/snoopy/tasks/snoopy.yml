@@ -1,0 +1,26 @@
+- name: Getting Remote IPv4
+  set_fact:
+    remote_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- name: Downloading Snoopy v2.2.6-3
+  get_url:
+    url: "http://download-ib01.fedoraproject.org/pub/fedora/linux/releases/30/Everything/x86_64/os/Packages/s/snoopy-2.2.6-3.fc24.x86_64.rpm"
+    dest: /opt/snoopy-2.2.6-3.fc24.x86_64.rpm
+
+- name: Installing Snoopy v2.2.6-3
+  shell: yum -y --nogpgcheck localinstall /opt/snoopy-2.2.6-3.fc24.x86_64.rpm
+
+- name: Enabling Services
+  shell: snoopy-enable
+
+- name: Configuring rsyslog
+  lineinfile:
+    path: /etc/rsyslog.conf
+    insertafter: '# ### end of the forwarding rule ###'
+    state: present
+    line: "authpriv.* @{{graylog_ip}}:{{snoopy_port}};RSYSLOG_SyslogProtocol23Format"
+
+- name: Starting Services
+  service:
+    name: rsyslog
+    state: restarted

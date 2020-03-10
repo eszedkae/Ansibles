@@ -1,0 +1,48 @@
+# ---
+- name: Getting IPv4
+  set_fact:
+    remote_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- name: Installing Snort v2.9.7
+  shell: DEBIAN_FRONTEND=noninteractive apt install -y snort
+
+- name: Getting Community Rules
+  unarchive:
+    src: https://www.snort.org/downloads/community/community-rules.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Getting Emerging Rules
+  unarchive:
+    src: https://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Configuring Rules  ->
+  shell: 'cp -r /opt/community-rules/*.rules /etc/snort/rules/ && cp -r /opt/rules/*.rules /etc/snort/rules/'
+
+- name: Configuring Rules -->
+  shell: 'touch /etc/snort/rules/white_list.rules && touch /etc/snort/rules/black_list.rules && touch /usr/local/lib/snort_dynamic.rules && touch /etc/snort/rules/local.rules && touch /usr/local/lib/snort_dynamicrules'
+
+- name: Configuring Rules --->
+  template:
+    src: snort.conf.j2
+    dest: /etc/snort/snort.conf
+
+- name: Configuring Rules ---->
+  template:
+    src: local.rules.j2
+    dest: /etc/snort/rules/local.rules
+
+- name: Configuring Rules ---->
+  template:
+    src: snort.j2
+    dest: /etc/init.d/snort
+
+- name: Loading Services
+  shell: systemctl daemon-reload
+
+- name: Starting Services
+  service:
+    name: snort
+    state: started

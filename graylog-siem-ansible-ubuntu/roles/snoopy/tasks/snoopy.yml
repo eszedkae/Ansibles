@@ -1,0 +1,20 @@
+- name: Getting Remote IPv4
+  set_fact:
+    remote_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- name: Installing Snoopy v2.4.6-3
+  apt:
+    name: snoopy
+    state: present
+
+- name: Configuring rsyslog
+  lineinfile:
+    path: /etc/rsyslog.conf
+    insertafter: '# ### end of the forwarding rule ###'
+    state: present
+    line: "authpriv.* @{{graylog_ip}}:{{snoopy_port}};RSYSLOG_SyslogProtocol23Format"
+
+- name: Starting Services
+  service:
+    name: rsyslog
+    state: restarted

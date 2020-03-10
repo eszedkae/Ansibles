@@ -1,0 +1,24 @@
+- name: Getting Remote IPv4
+  set_fact:
+    remote_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+
+- name: Downloading Nxlog Community Edition v2.10.2150-1
+  get_url: 
+    url: "https://nxlog.co/system/files/products/files/348/nxlog-ce-2.10.2150-1_rhel7.x86_64.rpm"
+    dest: /opt/nxlog-ce-2.10.2150-1_rhel7.x86_64.rpm
+
+- name: Installing Nxlog Community Edition v2.10.2150-1
+  shell: yum -y --nogpgcheck localinstall /opt/nxlog-ce-2.10.2150-1_rhel7.x86_64.rpm
+
+- name: Running Configurations
+  template:
+    src: nxlog.conf.j2
+    dest: /etc/nxlog.conf
+
+- name: Enabling Service nxlog
+  command: chkconfig nxlog on
+
+- name: Starting Service nxlog
+  service:
+    name: nxlog
+    state: started

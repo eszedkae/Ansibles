@@ -1,0 +1,10 @@
+---
+# tasks file for default
+- name: Inserting IP in /var/ossec/etc/ossec.conf
+  lineinfile:
+    path: /var/ossec/etc/ossec.conf
+    insertafter: '<white_list>::1</white_list>'
+    line: '<white_list>{{server_ip}}</white_list>'
+
+- name: Restarting Ossec
+  command: "/var/ossec/bin/ossec-control restart"
