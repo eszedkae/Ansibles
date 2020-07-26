@@ -1,0 +1,54 @@
+---
+
+    # - name: Download and install consul binary
+    #   unarchive:
+    #     src: "https://releases.hashicorp.com/consul/1.6.1/consul_1.6.1_linux_amd64.zip"
+    #     dest: /usr/bin/
+    #     remote_src: True
+
+    # - name: Copy consul service to server
+    #   copy: src=consul.service dest=/etc/systemd/system/consul.service
+
+    # - name: Create consul config directory
+    #   file: state=directory path=/etc/consul.d
+
+    # - name: Copy vault config to server
+    #   copy: src=ui.json dest=/etc/consul.d/
+
+    # - name: Start consul service
+    #   systemd:
+    #     state: started
+    #     name: consul
+    #     daemon_reload: yes
+  
+    - name: Download and install vault binary
+      unarchive:
+        src: "https://releases.hashicorp.com/vault/1.2.3/vault_1.2.3_linux_amd64.zip"
+        dest: /usr/bin/
+        remote_src: True
+  
+    - name: Create vault config directory
+      file: state=directory path=/etc/vault/
+  
+    - name: Copy vault config to server
+      copy: src=config.hcl dest=/etc/vault/
+  
+    - name: Copy vault service to server
+      copy: src=vault.service dest=/etc/systemd/system/vault.service
+  
+    - name: Start vault service
+      systemd:
+        state: started
+        name: vault
+        daemon_reload: yes
+  
+    - pause:
+        seconds: 15
+  
+    - name: Initialize the vault
+      command: vault operator init
+      register: keys
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+  
+    - debug: msg="{{ keys }}"
